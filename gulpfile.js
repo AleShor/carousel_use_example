@@ -12,6 +12,7 @@ var gulp = require('gulp'),
     notify = require('gulp-notify'),
     cache = require('gulp-cache'),
     browserSync = require('browser-sync'),
+    reload = browserSync.reload,
     del = require('del');
 
 // source files paths
@@ -41,6 +42,7 @@ gulp.task('assets', function(){
     .pipe(gulpIf('*.css', cssnano()))
     .pipe(gulpIf('*.js', uglify()))
     .pipe(gulp.dest(distdir))
+    .pipe(reload({stream:true}));
 });
 
 // Images
@@ -48,12 +50,14 @@ gulp.task('images', function() {
   return gulp.src(src.images)
     .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
     .pipe(gulp.dest(dist.images))
+    .pipe(reload({stream:true}));
 });
 
 // Fonts
 gulp.task('fonts', function() {
   return gulp.src(src.fonts)
     .pipe(gulp.dest(dist.fonts))
+    .pipe(reload({stream:true}));
 });
 
 // lint scripts code
@@ -67,7 +71,7 @@ gulp.task('lint', function() {
  gulp.task('browserSync', function() {
   browserSync({
     ui: {
-       port: 3002
+       port: 3001
     },
     server: {
       baseDir: distdir
@@ -87,9 +91,6 @@ gulp.task('watch', ['browserSync'], function() {
   gulp.watch(src.js, ['lint']);
   // Watch image files
   gulp.watch(src.images, [src.images]);
-
-  // Watch any files in dist/, reload on change
-  gulp.watch(dist.all).on('change', browserSync.reload);
 });
 
 // Default task
